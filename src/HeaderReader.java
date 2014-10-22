@@ -43,18 +43,17 @@ public class HeaderReader {
 
     public static int parseIntFromBytesBigEndian (byte[] b) {
         int res = 0;
-        int k = 1;
+        int k = 0;
         int bi;
         for (int i = b.length - 1; i >= 0; i--) {
             bi = b[i];
-            res += k*(bi < 0 ? (bi + 256) : bi);
-            k <<= 8;
+            res |= (bi < 0 ? (bi + 256) : bi)<<(k<<3);
+            k++;
         }
         return res;
     }
     public static Record readNextRecordsInfo(FileInputStream in) {
         Record res = new Record();
-        res.recordInfo = new HashMap<String, Integer>();
         res.recordInfo.put("record Data Offset", parseIntFromBytesBigEndian(readBytes(in, 4)));
         res.recordInfo.put("record Attributes", parseIntFromBytesBigEndian(readBytes(in, 1)));
         res.recordInfo.put("UniqueID", parseIntFromBytesBigEndian(readBytes(in, 3)));
@@ -95,7 +94,10 @@ public class HeaderReader {
             records[i] = readNextRecordsInfo(in);
         }
         System.out.println(records[0].recordInfo.get("record Data Offset"));
-        in.skip(2);
-        HashMap<String, Integer> PalmDOCHeader
+        in.skip(5);
+        for (int i = 0; i < records.length; i++) {
+            System.out.println(records[i].recordInfo.get("record Data Offset"));
+        }
+//        HashMap<String, Integer> PalmDOCHeader
     }
 }
