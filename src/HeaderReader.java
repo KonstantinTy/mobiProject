@@ -41,13 +41,25 @@ public class HeaderReader {
         return res;
     }
 
+    public static HashMap<String, Integer> readPalmDOCHeader(FileInputStream in) {
+        HashMap<String, Integer> res = new HashMap<String, Integer>();
+        res.put("Compression", parseIntFromBytesBigEndian(readBytes(in, 2)));
+        res.put("Unused", parseIntFromBytesBigEndian(readBytes(in, 2)));
+        res.put("text length", parseIntFromBytesBigEndian(readBytes(in, 4)));
+        res.put("record count", parseIntFromBytesBigEndian(readBytes(in, 2)));
+        res.put("record size", parseIntFromBytesBigEndian(readBytes(in, 2)));
+        // Здесь может быть неверное считывание, вики сообщает о двух вариантах
+        res.put("Encryption Type", parseIntFromBytesBigEndian(readBytes(in, 2)));
+        res.put("Unknown", parseIntFromBytesBigEndian(readBytes(in, 2)));
+        return res;
+    }
     public static int parseIntFromBytesBigEndian (byte[] b) {
         int res = 0;
         int k = 0;
         int bi;
         for (int i = b.length - 1; i >= 0; i--) {
             bi = b[i];
-            res |= (bi < 0 ? (bi + 256) : bi)<<(k<<3);
+            res |= (bi < 0 ? (bi + 256) : bi) << (k << 3);
             k++;
         }
         return res;
@@ -66,8 +78,9 @@ public class HeaderReader {
             this.recordInfo= new HashMap<String, Integer>();
         }
     }
-    public static int bytes4int (byte[] b) {
-        return (b[0]<<12)+(b[1]<<8)+(b[2]<<4)+(b[3]);
+
+    public static HashMap<String, Integer> parseByScheme(String[] schemeFields, String[] schemeSizes, FileInputStream in) {
+        
     }
     public static void main (String argz[]) throws Exception {
         FileInputStream in = new FileInputStream(new File("test.mobi"));
@@ -82,7 +95,7 @@ public class HeaderReader {
         HashMap<String, byte[]> PalmDatabaseHeader = readPDH(in);
 //        byte[] test = PalmDatabaseHeader.get("sortInfoID");
 //        System.out.println(parseIntFromBytesBigEndian(test));
-        Record rec;
+//        Record rec;
 /**        for (int i=0; i < 110; i++) {
             rec = readNextRecordsInfo(in);
             System.out.println(rec.recordInfo.get("record Data Offset"));
@@ -93,11 +106,9 @@ public class HeaderReader {
         for (int i = 0; i < numberOfRecords; i++) {
             records[i] = readNextRecordsInfo(in);
         }
-        System.out.println(records[0].recordInfo.get("record Data Offset"));
-        in.skip(5);
-        for (int i = 0; i < records.length; i++) {
-            System.out.println(records[i].recordInfo.get("record Data Offset"));
-        }
-//        HashMap<String, Integer> PalmDOCHeader
+//        System.out.println(records[0].recordInfo.get("record Data Offset"));
+        in.skip(2);
+        HashMap<String, Integer> PalmDOCHeader = readPalmDOCHeader(in);
+//        System.out.println(PalmDOCHeader.get("record size"));
     }
 }
