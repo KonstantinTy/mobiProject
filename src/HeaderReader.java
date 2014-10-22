@@ -131,6 +131,14 @@ public class HeaderReader {
         }
     }
 
+    public static HashMap<String, Integer> parseByScheme(Scheme scheme, FileInputStream in) {
+        HashMap<String, Integer> res = new HashMap<String, Integer>();
+        for (int i=0; i < scheme.length; i++) {
+            res.put(scheme.fields[i], parseIntFromBytesBigEndian(readBytes(in, scheme.sizes[i])));
+        }
+        return res;
+    }
+
     public static HashMap<String, Integer> readPDH(FileInputStream in) {
         HashMap<String, Integer> res = parseByScheme(palmDBScheme, in);
         return res;
@@ -148,14 +156,6 @@ public class HeaderReader {
         return res;
     }
 
-
-    public static HashMap<String, Integer> parseByScheme(Scheme scheme, FileInputStream in) {
-        HashMap<String, Integer> res = new HashMap<String, Integer>();
-        for (int i=0; i < scheme.length; i++) {
-            res.put(scheme.fields[i], parseIntFromBytesBigEndian(readBytes(in, scheme.sizes[i])));
-        }
-        return res;
-    }
 
     public static void main (String argz[]) throws Exception {
         createScheme();
