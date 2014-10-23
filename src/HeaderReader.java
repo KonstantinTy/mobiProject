@@ -5,6 +5,8 @@
  * Time: 13:39
  * To change this template use File | Settings | File Templates.
  */
+import utils.ByteUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,18 +21,6 @@ public class HeaderReader {
             in.read(res);
         } catch (Exception e) {
             System.out.println("Troubles with in.read()");
-        }
-        return res;
-    }
-
-    public static int parseIntFromBytesBigEndian (byte[] b) {
-        int res = 0;
-        int k = 0;
-        int bi;
-        for (int i = b.length - 1; i >= 0; i--) {
-            bi = b[i];
-            res |= (bi < 0 ? (bi + 256) : bi) << (k << 3);
-            k++;
         }
         return res;
     }
@@ -134,7 +124,7 @@ public class HeaderReader {
     public static HashMap<String, Integer> parseByScheme(Scheme scheme, FileInputStream in) {
         HashMap<String, Integer> res = new HashMap<String, Integer>();
         for (int i=0; i < scheme.length; i++) {
-            res.put(scheme.fields[i], parseIntFromBytesBigEndian(readBytes(in, scheme.sizes[i])));
+            res.put(scheme.fields[i], ByteUtils.parseIntFromBytesBigEndian(readBytes(in, scheme.sizes[i])));
         }
         return res;
     }
