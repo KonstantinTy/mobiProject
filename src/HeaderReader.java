@@ -41,9 +41,9 @@ public class HeaderReader {
     }
 
     public static class Record {
-        public HashMap<String, Integer> recordInfo;
-        public Record() {
-            this.recordInfo= new HashMap<String, Integer>();
+        public HashMap<String, Long> recordInfo;
+        public Record(HashMap<String, Long> info) {
+            this.recordInfo = info;
         }
     }
 
@@ -134,11 +134,11 @@ public class HeaderReader {
         return res;
     }
 
-    public static Record readNextRecordsInfo(FileInputStream in) {
-        Record res = new Record();
-        res.recordInfo = parseByScheme(recordInfoScheme, in);
-        return res;
-    }
+//    public static Record readNextRecordsInfo(FileInputStream in) {
+//        Record res = new Record();
+//        res.recordInfo = parseByScheme(recordInfoScheme, in);
+//        return res;
+///    }
 
 
     public static HashMap<String, Integer> readPalmDOCHeader(FileInputStream in) {
@@ -170,11 +170,14 @@ public class HeaderReader {
         int numberOfRecords = (PalmDatabaseHeader.get("number of Records"));
         Record[] records = new Record[numberOfRecords];
         for (int i = 0; i < numberOfRecords; i++) {
-            records[i] = readNextRecordsInfo(in);
+ //           records[i] = readNextRecordsInfo(in);
         }
-//        System.out.println(records[0].recordInfo.get("record Data Offset"));
+        System.out.println(records[0].recordInfo.get("record Data Offset"));
         in.skip(2); // 2 unused bytes
         HashMap<String, Integer> PalmDOCHeader = readPalmDOCHeader(in);
-//        System.out.println(PalmDOCHeader.get("record size"));
+        System.out.println(PalmDOCHeader.get("record size"));
+        MobiBook book = new MobiBook();
+        book.parse("test.mobi");
+        System.out.println(book.palmDB.get("number of records"));
     }
 }
