@@ -19,6 +19,9 @@ public class MobiBook {
 
     public HashMap<String, Object> palmDB;
     public HashMap<String, Object> palmDOCHeader;
+    public HashMap<String, Object> mobiHeader;
+
+    public long record0Start;
 
     public MobiBook () {
 
@@ -39,15 +42,35 @@ public class MobiBook {
         this.fileStream = new FileInputStream(file);
         parsePalmDB();
 
-        int recordNumber = (int) ((long) this.<Long>getValue("number of records", palmDB));
-        this.records = new HeaderReader.Record[recordNumber];
+        int recordNumber = (this.<Integer>getValue("number of records", palmDB));
+        this.records = new HeaderReader.Record[(int)recordNumber];
         for (int i=0; i < recordNumber; i++) {
             parseRecordInfo(i);
         }
-
+        fileStream.skip(2); //traditionally zeros, not parsed by schemes
+        record0Start = fileStream.getChannel().position();
         parsePalmDOCHeader();
+
+        parseMobiHeader();
+
+        System.out.println("cur offset " + fileStream.getChannel().position());
     }
 
+    public boolean hasEXTHHeader() {
+        return ((Long)this.mobiHeader.get("EXTH flags") & (1 << 6)) != 0;
+    }
+
+    public String finallyGetName() throws Exception{
+        FileInputStream newInp = new FileInputStream(this.file);
+        long offset = (Long)this.mobiHeader.get("Full Name Offset");
+        long len = (Long)this.mobiHeader.get("Full Name Length");
+        System.out.println(offset);
+        System.out.println(len);
+        byte[] b = new byte[(int)len];
+        newInp.skip(record0Start + offset);
+        newInp.read(b);
+        return new String(b);
+    }
     public void parsePalmDB() throws Exception {
         Scheme scheme = Schemes.palmDB;
         this.palmDB = scheme.parseScheme(fileStream);
@@ -56,11 +79,16 @@ public class MobiBook {
     public void parseRecordInfo(int n) throws Exception{
         Scheme scheme = Schemes.recordInfo;
         this.records[n] = new HeaderReader.Record(scheme.parseScheme(fileStream));
-        fileStream.skip(2); //traditionally zeros, not parsed by schemes
     }
 
     public void parsePalmDOCHeader() throws Exception{
         Scheme scheme = Schemes.palmDOCHeader;
         this.palmDOCHeader = scheme.parseScheme(fileStream);
     }
+
+    public void parseMobiHeader() throws Exception{
+        Scheme scheme = Schemes.mobiHeader;
+        this.mobiHeader = scheme.parseScheme(fileStream);
+    }
+
 }

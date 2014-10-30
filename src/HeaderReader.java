@@ -172,12 +172,14 @@ public class HeaderReader {
         for (int i = 0; i < numberOfRecords; i++) {
  //           records[i] = readNextRecordsInfo(in);
         }
-        System.out.println(records[0].recordInfo.get("record Data Offset"));
+//        System.out.println(records[0].recordInfo.get("record Data Offset"));
         in.skip(2); // 2 unused bytes
-        HashMap<String, Integer> PalmDOCHeader = readPalmDOCHeader(in);
-        System.out.println(PalmDOCHeader.get("record size"));
+//        HashMap<String, Integer> PalmDOCHeader = readPalmDOCHeader(in);
+//        System.out.println(PalmDOCHeader.get("record size"));
         MobiBook book = new MobiBook();
         book.parse("test.mobi");
         System.out.println(book.palmDB.get("number of records"));
+        System.out.println((String)book.mobiHeader.get("identifier"));
+        System.out.println("name: " + (String)book.finallyGetName());
     }
 }

@@ -32,7 +32,10 @@ public class SchemeItem {
                 return ByteUtils.parseLongFromBytesBigEndian(b);
             case STRING :
                 return new String(b);
+            case UNKNOWN:
+                return b;
             default : //for BITFIELD
+                // TODO: пока я не вижу смысла в аккуратном парсе битовых полей, но когда-нибудь можно доделать.
                 return 239;
         }
     }

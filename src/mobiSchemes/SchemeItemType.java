@@ -7,5 +7,6 @@ public enum SchemeItemType {
     INT,
     LONG,
     STRING,
-    BITFIELD
+    BITFIELD,
+    UNKNOWN
 }
