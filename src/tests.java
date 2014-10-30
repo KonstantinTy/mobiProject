@@ -21,9 +21,11 @@ public class tests {
         }
         try {
             book.parsePalmDB();
-            Assert.assertEquals((long)book.palmDB.get("number of records"), 110);
+            Assert.assertEquals((int)book.<Integer>getValue("number of records", book.palmDB), 110);
         } catch (Exception e) {
             System.out.println(e.toString());
         }
     }
+
+
 }

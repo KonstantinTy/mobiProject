@@ -36,4 +36,27 @@ public class ByteUtils {
         return res;
     }
 
+    // removed by String constructor :)
+/**
+    public static String parseString (byte[] b) throws Exception {
+        String res;
+        if ((b.length & 1) == 1) {
+            throw new Exception("Cannot parse string from byte array with odd length");
+        } else {
+            res = "";
+            int count = (b.length >> 1);
+            char c;
+            int temp1, temp2;
+            for (int i = 0; i < count; i++) {
+                temp1 = b[i << 1];
+                temp1 = (temp1 < 0) ? (temp1 + 256) : temp1;
+                temp2 = b[(i << 1) | 1];
+                temp2 = (temp2 < 0) ? (temp2 + 256) : temp2;
+                c = (char)((temp1 << 8) + temp2);
+                res += c;
+            }
+        }
+        return res;
+    }
+*/
 }

@@ -20,14 +20,11 @@ public class Scheme {
         this.items = items;
     }
 
-    public HashMap<String, Long> parseScheme (FileInputStream in) throws IOException{
-        HashMap<String, Long> res = new HashMap<String, Long>();
+    public HashMap<String, Object> parseScheme (FileInputStream in) throws Exception{
+        HashMap<String, Object> res = new HashMap<String, Object>();
         byte[] b;
         for (SchemeItem item : items) {
-            b = new byte[item.size];
-            in.read(b);
-            res.put(item.name, ByteUtils.parseLongFromBytesBigEndian(b));
-            //TODO: other itemType cases
+            res.put(item.name, item.parseItem(in));
         }
         return res;
     }

@@ -41,8 +41,8 @@ public class HeaderReader {
     }
 
     public static class Record {
-        public HashMap<String, Long> recordInfo;
-        public Record(HashMap<String, Long> info) {
+        public HashMap<String, Object> recordInfo;
+        public Record(HashMap<String, Object> info) {
             this.recordInfo = info;
         }
     }

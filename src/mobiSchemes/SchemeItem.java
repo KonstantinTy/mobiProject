@@ -22,7 +22,7 @@ public class SchemeItem {
         this.size = size;
         this.name = name;
     }
-    public long parseItem (FileInputStream in) throws IOException{
+    public Object parseItem (FileInputStream in) throws Exception{
         byte[] b = new byte[this.size];
         in.read(b);
         switch (this.type) {
@@ -30,7 +30,9 @@ public class SchemeItem {
                 return ByteUtils.parseIntFromBytesBigEndian(b);
             case LONG :
                 return ByteUtils.parseLongFromBytesBigEndian(b);
-            default: //TODO: other cases
+            case STRING :
+                return new String(b);
+            default : //for BITFIELD
                 return 239;
         }
     }
