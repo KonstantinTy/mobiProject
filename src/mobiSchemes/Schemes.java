@@ -76,12 +76,12 @@ public class Schemes {
                     new SchemeItem(SchemeItemType.LONG, 4, "Huffman Table Length"),
                     new SchemeItem(SchemeItemType.LONG, 4, "EXTH flags"),
                     new SchemeItem(SchemeItemType.UNKNOWN, 32, "?"),
-                    new SchemeItem(SchemeItemType.LONG, 4, "Unknown1"),
+                    new SchemeItem(SchemeItemType.UNKNOWN, 4, "Unknown0"),
                     new SchemeItem(SchemeItemType.LONG, 4, "DRM Offset"),
                     new SchemeItem(SchemeItemType.LONG, 4, "DRM Count"),
                     new SchemeItem(SchemeItemType.LONG, 4, "DRM Size"),
                     new SchemeItem(SchemeItemType.LONG, 4, "DRM Flags"),
-                    new SchemeItem(SchemeItemType.UNKNOWN, 8, "Unknown"),
+                    new SchemeItem(SchemeItemType.UNKNOWN, 8, "Unknown1"),
                     new SchemeItem(SchemeItemType.INT, 2, "First content record number"),
                     new SchemeItem(SchemeItemType.INT, 2, "Last content record number"),
                     new SchemeItem(SchemeItemType.UNKNOWN, 4, "Unknown2"),
@@ -102,6 +102,14 @@ public class Schemes {
                     new SchemeItem(SchemeItemType.UNKNOWN, 4, "Unknown9"),
                     new SchemeItem(SchemeItemType.UNKNOWN, 4, "Unknown10"),
                     new SchemeItem(SchemeItemType.UNKNOWN, 4, "Unknown11")
+            }
+    );
+
+    public static final Scheme EXTHHeader = new Scheme(
+            new SchemeItem[]{
+                    new SchemeItem(SchemeItemType.STRING, 4, "identifier"),
+                    new SchemeItem(SchemeItemType.LONG, 4, "header length"),
+                    new SchemeItem(SchemeItemType.LONG, 4, "record Count")
             }
     );
     public Schemes () {

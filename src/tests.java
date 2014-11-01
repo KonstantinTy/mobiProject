@@ -1,6 +1,7 @@
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -27,5 +28,25 @@ public class tests {
         }
     }
 
+    @Test
+    public void parseMobiHeader() throws Exception{
+        File dir = new File("ustBooks");
+        File[] books = dir.listFiles();
+        MobiBook mobibook;
+        String s;
+        byte[] b;
+        for (File book : books) {
+            mobibook = new MobiBook();
+            mobibook.parse("ustBooks/" + book.getName());
+            s = (String)mobibook.EXTHHeader.get("identifier");
+            Assert.assertEquals(s, "EXTH");
+            Assert.assertEquals((String)mobibook.mobiHeader.get("identifier"), "MOBI");
+            for (MobiBook.EXTHRecord rec : mobibook.EXTHRecords) {
+                if (rec.recordType == 100)  {
+                    System.out.println(new String(rec.data));
+                }
+            }
+        }
+    }
 
 }

@@ -177,9 +177,33 @@ public class HeaderReader {
 //        HashMap<String, Integer> PalmDOCHeader = readPalmDOCHeader(in);
 //        System.out.println(PalmDOCHeader.get("record size"));
         MobiBook book = new MobiBook();
-        book.parse("test.mobi");
+        book.parse("pg11.mobi");
         System.out.println(book.palmDB.get("number of records"));
         System.out.println((String)book.mobiHeader.get("identifier"));
         System.out.println("name: " + (String)book.finallyGetName());
+        System.out.println(book.hasEXTHHeader());
+        System.out.println((String)book.EXTHHeader.get("identifier"));
+        /**
+        byte[] b;
+        for (int i=1; i < 12; i++) {
+            b = ((byte[])book.mobiHeader.get("Unknown" + i));
+            for (int j = 0; j < b.length; j++) {
+                System.out.print(b[j] + " ");
+            }
+            System.out.println();
+        }
+        */
+        System.out.println(book.mobiHeader.containsKey("INDX Record Offset"));
+        System.out.println(book.mobiHeader.get("header length"));
+        for (String key : book.EXTHHeader.keySet()) {
+            System.out.print(key + "    ");
+            System.out.println(book.EXTHHeader.get(key));
+        }
+        for (MobiBook.EXTHRecord rec : book.EXTHRecords) {
+            System.out.println(rec.recordType + "  " + rec.recordLength + "  " + (new String(rec.data)));
+        }
+        byte[] testb = new byte[100];
+        book.fileStream.read(testb);
+        System.out.println(new String(testb));
     }
 }
