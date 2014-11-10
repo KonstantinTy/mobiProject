@@ -7,6 +7,7 @@
  */
 import utils.ByteUtils;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -177,7 +178,7 @@ public class HeaderReader {
 //        HashMap<String, Integer> PalmDOCHeader = readPalmDOCHeader(in);
 //        System.out.println(PalmDOCHeader.get("record size"));
         MobiBook book = new MobiBook();
-        book.parse("pg11.mobi");
+        book.parse("ustBooks/Bettelheym_Lyudi_v_kontslagere.246373.azw3");
         System.out.println(book.palmDB.get("number of records"));
         System.out.println((String)book.mobiHeader.get("identifier"));
         System.out.println("name: " + (String)book.finallyGetName());
@@ -200,10 +201,17 @@ public class HeaderReader {
             System.out.println(book.EXTHHeader.get(key));
         }
         for (MobiBook.EXTHRecord rec : book.EXTHRecords) {
-            System.out.println(rec.recordType + "  " + rec.recordLength + "  " + (new String(rec.data)));
+//            System.out.println(rec.recordType + "  " + rec.recordLength + "  " + (new String(rec.data)));
         }
-        byte[] testb = new byte[100];
-        book.fileStream.read(testb);
-        System.out.println(new String(testb));
+        byte[] bb  = new byte[(int)(long)(Long)book.mobiHeader.get("Full Name Length") + 5];
+        book.fileStream.read(bb);
+        System.out.println(new String(bb));
+        int nullbytescount = 0;
+        while (book.fileStream.read() == 0) {
+            nullbytescount++;
+        }
+        System.out.println(nullbytescount);
+        System.out.println(book.fileStream.getChannel().position());
+        System.out.println(book.records[1].recordInfo.get("record Data Offset"));
     }
 }

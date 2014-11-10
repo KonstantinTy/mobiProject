@@ -41,11 +41,17 @@ public class tests {
             s = (String)mobibook.EXTHHeader.get("identifier");
             Assert.assertEquals(s, "EXTH");
             Assert.assertEquals((String)mobibook.mobiHeader.get("identifier"), "MOBI");
+            // Наглядный тест для людей. Проверит, разумно ли считался автор. На текущих примерах работает хорошо.
             for (MobiBook.EXTHRecord rec : mobibook.EXTHRecords) {
                 if (rec.recordType == 100)  {
                     System.out.println(new String(rec.data));
                 }
             }
+            // Тест для познания истин. Проверяет, чтo в record0 после EXTH и имени книги ничего нет. На текущих примерах - и правда, нет.
+            // TODO: убрать эту строку после допиливания парса до чтения имени.
+            mobibook.fileStream.read(new byte[(int)(long)(Long)mobibook.mobiHeader.get("Full Name Length") + 5]);
+            while (mobibook.fileStream.read() == 0) {}
+            Assert.assertEquals((long)(Long)mobibook.records[1].recordInfo.get("record Data Offset"), mobibook.fileStream.getChannel().position() - 1);
         }
     }
 
