@@ -25,6 +25,8 @@ public class MobiBook {
     public HashMap<String, Object> EXTHHeader;
     public long record0Start;
 
+    public String bookName;
+
     public class EXTHRecord {
         long recordType;
         long recordLength;
@@ -63,12 +65,20 @@ public class MobiBook {
         parseMobiHeader();
 
    //     System.out.println("cur offset " + fileStream.getChannel().position());
-        parseEXTHHeader();
+        if (this.hasEXTHHeader()) {
+            parseEXTHHeader();
+        } else {
+            System.out.println("No EXTH!!!");
+        }
+        parseBookName();
+        skipToRecord1Start();
     }
+
     public boolean hasEXTHHeader() {
         return ((Long)this.mobiHeader.get("EXTH flags") & (0x40)) != 0;
     }
 
+  // for tests only
     public String finallyGetName() throws Exception{
         FileInputStream newInp = new FileInputStream(this.file);
         long offset = this.<Long>getValue("Full Name Offset", mobiHeader);
@@ -79,6 +89,21 @@ public class MobiBook {
         newInp.skip(record0Start + offset);
         newInp.read(b);
         return new String(b);
+    }
+
+    public void parseBookName() throws Exception{
+        long len = this.<Long>getValue("Full Name Length", mobiHeader);
+        long offset = this.<Long>getValue("Full Name Offset", mobiHeader);
+        // TODO: понять, почему здесь иногда скипятся 0-4 байта.
+        //System.out.println(record0Start + offset - this.fileStream.getChannel().position());
+        this.fileStream.skip(record0Start + offset - this.fileStream.getChannel().position());
+        byte[] b = new byte[(int)len];
+        this.fileStream.read(b);
+        this.bookName = new String(b);
+    }
+
+    public void skipToRecord1Start() throws Exception{
+        this.fileStream.skip(((Long)this.records[1].recordInfo.get("record Data Offset"))-(this.fileStream.getChannel().position()));
     }
     public void parsePalmDB() throws Exception {
         Scheme scheme = Schemes.palmDB;
@@ -123,7 +148,7 @@ public class MobiBook {
                     }
                 }
             } else {
-                System.out.println("  abandoned: " + item.name);
+//                System.out.println("  abandoned: " + item.name);
             }
         }
         //TODO: There are some bytes that i don't know why them exists
@@ -145,6 +170,5 @@ public class MobiBook {
             this.EXTHRecords.add(cur);
         }
         this.fileStream.skip(3 - ((this.<Long>getValue("header length", this.EXTHHeader) - 1)&3));
-
     }
 }
