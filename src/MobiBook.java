@@ -103,7 +103,7 @@ public class MobiBook {
     }
 
     public void skipToRecord1Start() throws Exception{
-        this.fileStream.skip(((Long)this.records[1].recordInfo.get("record Data Offset"))-(this.fileStream.getChannel().position()));
+        this.fileStream.skip(((Long)this.records[1].recordInfo.get("record Data Offset")) - (this.fileStream.getChannel().position()));
     }
     public void parsePalmDB() throws Exception {
         Scheme scheme = Schemes.palmDB;

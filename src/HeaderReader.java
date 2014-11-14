@@ -202,12 +202,26 @@ public class HeaderReader {
         }
         System.out.println(book.fileStream.getChannel().position());
         System.out.println(book.records[1].recordInfo.get("record Data Offset"));
-        PrintWriter out = new PrintWriter(new File("rec1.txt"));
-        byte[] b = new byte[64];
-        for (long i = (Long)book.records[1].recordInfo.get("record Data Offset"); i < (Long)book.records[40].recordInfo.get("record Data Offset"); i+= 64) {
-            book.fileStream.read(b);
-            out.print(new String(b));
+        FileOutputStream out = new FileOutputStream(new File("rec1.txt"));
+
+        BufferedReader bufr = new BufferedReader(new FileReader((book.file)));
+        bufr.skip(book.fileStream.getChannel().position());
+        System.out.println("rec1 start " + book.records[1].recordInfo.get("record Data Offset"));
+        System.out.println("curpos " + book.fileStream.getChannel().position());
+        byte[] b = new byte[1];
+        //book.fileStream.read(b);
+        //System.out.println(new String(b));
+        for (int i = ((Long)book.records[1].recordInfo.get("record Data Offset")).intValue(); i < ((Long)book.records[2].recordInfo.get("record Data Offset")).intValue(); i++) {
+            b[0] = (byte)book.fileStream.read();
+            out.write(b);
         }
         out.close();
+        BufferedReader in2 = new BufferedReader(new FileReader("rec1.txt"));
+        String s = "";
+        while (in2.ready()) {
+            s += in2.readLine();
+
+        }
+        System.out.println(LZ77.decompressStr(s));
     }
 }

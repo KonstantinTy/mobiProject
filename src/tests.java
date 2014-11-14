@@ -53,6 +53,9 @@ public class tests {
                 System.out.println("  Unknown author");
             }
             System.out.println("  " + mobibook.bookName);
+            //System.out.println("  Compression:  " + mobibook.<Integer>getValue("compression", mobibook.palmDOCHeader));
+            // Интересно, кто-нибудь использует не LZ77?
+            Assert.assertEquals((Integer)2, mobibook.<Integer>getValue("compression", mobibook.palmDOCHeader));
         }
     }
 
