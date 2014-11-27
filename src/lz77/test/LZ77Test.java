@@ -24,7 +24,7 @@ public class LZ77Test {
         int bufferSize = 2048;
         byte[] data = new byte[bufferSize];
         while ((len = lz77.read(data, 0, bufferSize)) != -1) {
-            System.out.println(new String(data));
+            System.out.println(new String(data, 0, len));
         }
     }
 }
