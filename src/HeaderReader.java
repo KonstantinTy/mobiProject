@@ -5,6 +5,7 @@
  * Time: 13:39
  * To change this template use File | Settings | File Templates.
  */
+import lz77.LZ77InputStream;
 import utils.ByteUtils;
 
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
@@ -202,26 +203,15 @@ public class HeaderReader {
         }
         System.out.println(book.fileStream.getChannel().position());
         System.out.println(book.records[1].recordInfo.get("record Data Offset"));
-        FileOutputStream out = new FileOutputStream(new File("rec1.txt"));
-
-        BufferedReader bufr = new BufferedReader(new FileReader((book.file)));
-        bufr.skip(book.fileStream.getChannel().position());
-        System.out.println("rec1 start " + book.records[1].recordInfo.get("record Data Offset"));
-        System.out.println("curpos " + book.fileStream.getChannel().position());
-        byte[] b = new byte[1];
-        //book.fileStream.read(b);
-        //System.out.println(new String(b));
-        for (int i = ((Long)book.records[1].recordInfo.get("record Data Offset")).intValue(); i < ((Long)book.records[2].recordInfo.get("record Data Offset")).intValue(); i++) {
-            b[0] = (byte)book.fileStream.read();
-            out.write(b);
+        byte[] extras = (byte[])book.mobiHeader.get("Extra Record Data Flags");
+        for (int i=0; i < extras.length; i++) {
+            System.out.println(extras[i]);
         }
-        out.close();
-        BufferedReader in2 = new BufferedReader(new FileReader("rec1.txt"));
-        String s = "";
-        while (in2.ready()) {
-            s += in2.readLine();
-
-        }
-        System.out.println(LZ77.decompressStr(s));
+        long rec1len = (Long)book.records[3].recordInfo.get("record Data Offset") - (Long)book.records[1].recordInfo.get("record Data Offset");
+        System.out.println(rec1len);
+        LZ77InputStream lz77 = new LZ77InputStream(book.fileStream);
+        byte[] rec1data = new byte[(int)rec1len];
+        lz77.read(rec1data, 0, (int)rec1len);
+        System.out.println(new String(rec1data, 0, (int)rec1len));
     }
 }

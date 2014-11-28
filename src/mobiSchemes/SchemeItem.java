@@ -36,7 +36,7 @@ public class SchemeItem {
                 return b;
             default : //for BITFIELD
                 // TODO: пока я не вижу смысла в аккуратном парсе битовых полей, но когда-нибудь можно доделать.
-                return 239;
+                return b;
         }
     }
 }
