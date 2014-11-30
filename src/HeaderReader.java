@@ -207,11 +207,11 @@ public class HeaderReader {
         for (int i=0; i < extras.length; i++) {
             System.out.println(extras[i]);
         }
-        long rec1len = (Long)book.records[3].recordInfo.get("record Data Offset") - (Long)book.records[1].recordInfo.get("record Data Offset");
-        System.out.println(rec1len);
-        LZ77InputStream lz77 = new LZ77InputStream(book.fileStream);
-        byte[] rec1data = new byte[(int)rec1len];
-        lz77.read(rec1data, 0, (int)rec1len);
-        System.out.println(new String(rec1data, 0, (int)rec1len));
+        int recCount = book.records.length;
+        System.out.println(book.records[recCount - 1].recordInfo.get("record Data Offset"));
+        System.out.println(book.mobiHeader.get("text Encoding"));
+        System.out.println(book.mobiHeader.get("First Non-book index?"));
+        System.out.println(book.mobiHeader.get("First Image index"));
+
     }
 }

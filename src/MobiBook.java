@@ -1,12 +1,10 @@
+import lz77.LZ77InputStream;
 import mobiSchemes.Scheme;
 import mobiSchemes.SchemeItem;
 import mobiSchemes.SchemeItemType;
 import mobiSchemes.Schemes;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -72,6 +70,18 @@ public class MobiBook {
         }
         parseBookName();
         skipToRecord1Start();
+        int recordsCount = records.length - 1; // Количество рекордов, корме нулевого
+        int curRecLength;
+        LZ77InputStream lz77 = new LZ77InputStream(fileStream);
+        for (int i=1; i <= recordsCount; i++) {
+            PrintWriter outRec = new PrintWriter(new File("recs/rec" + i + ".txt"));
+            if (i < recordsCount) {
+                curRecLength = (int)((Long)records[i+1].recordInfo.get("record Data Offset") - (Long)records[i].recordInfo.get("record Data Offset"));
+            } else {
+                curRecLength = Integer.MAX_VALUE; // no idea
+            }
+            parseRecord(lz77, outRec, curRecLength);
+        }
     }
 
     public boolean hasEXTHHeader() {
@@ -170,5 +180,13 @@ public class MobiBook {
             this.EXTHRecords.add(cur);
         }
         this.fileStream.skip(3 - ((this.<Long>getValue("header length", this.EXTHHeader) - 1)&3));
+    }
+
+    public void parseRecord (LZ77InputStream lz77,  PrintWriter out, int len) throws Exception{
+        int length = Math.min(len, fileStream.available());
+        byte[] data = new byte[length];
+        lz77.read(data, 0, length);
+        out.print(new String(data));
+        out.close();
     }
 }
