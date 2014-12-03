@@ -148,7 +148,7 @@ public class HeaderReader {
 
     public static void main (String argz[]) throws Exception {
         createScheme();
-        FileInputStream in = new FileInputStream(new File("test.mobi"));
+        FileInputStream in = new FileInputStream(new File("ustBooks/Ieriesi - Eduard Limonov.mobi"));
 /**        for (int i=0; i<100; i++) {
             read4bytes(in, length);
             System.out.println(4*i + " " + length[0]);
@@ -209,9 +209,15 @@ public class HeaderReader {
         }
         int recCount = book.records.length;
         System.out.println(book.records[recCount - 1].recordInfo.get("record Data Offset"));
-        System.out.println(book.mobiHeader.get("text Encoding"));
         System.out.println(book.mobiHeader.get("First Non-book index?"));
         System.out.println(book.mobiHeader.get("First Image index"));
-
+        System.out.println(book.palmDB.get("number of records"));
+        System.out.println(book.palmDB.get("nextRecordListID"));
+        System.out.println(book.palmDOCHeader.get("record size"));
+        PrintWriter recOffs = new PrintWriter(new File("recoffs.txt"));
+        for (int i=0; i < book.records.length; i++) {
+            recOffs.println(book.records[i].recordInfo.get("record Data Offset"));
+        }
+        recOffs.close();
     }
 }

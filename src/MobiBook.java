@@ -72,16 +72,21 @@ public class MobiBook {
         skipToRecord1Start();
         int recordsCount = records.length - 1; // Количество рекордов, корме нулевого
         int curRecLength;
-        LZ77InputStream lz77 = new LZ77InputStream(fileStream);
-        for (int i=1; i <= recordsCount; i++) {
+        LZ77InputStream lz77;
+        byte[] curRecord;
+        ByteArrayInputStream curRecStream;
+        for (int i=1; i < recordsCount; i++) {
+            //TODO: length of last record
             PrintWriter outRec = new PrintWriter(new File("recs/rec" + i + ".txt"));
-            if (i < recordsCount) {
-                curRecLength = (int)((Long)records[i+1].recordInfo.get("record Data Offset") - (Long)records[i].recordInfo.get("record Data Offset"));
-            } else {
-                curRecLength = Integer.MAX_VALUE; // no idea
-            }
+            curRecLength = (int)((Long)records[i+1].recordInfo.get("record Data Offset") - (Long)records[i].recordInfo.get("record Data Offset"));
+            curRecord = new byte[curRecLength];
+            fileStream.read(curRecord);
+            curRecStream = new ByteArrayInputStream(curRecord);
+            lz77 = new LZ77InputStream(curRecStream);
             parseRecord(lz77, outRec, curRecLength);
+
         }
+
     }
 
     public boolean hasEXTHHeader() {
@@ -185,7 +190,11 @@ public class MobiBook {
     public void parseRecord (LZ77InputStream lz77,  PrintWriter out, int len) throws Exception{
         int length = Math.min(len, fileStream.available());
         byte[] data = new byte[length];
-        lz77.read(data, 0, length);
+        try {
+            lz77.read(data, 0, length);
+        } catch (Exception eee) {
+
+        }
         out.print(new String(data));
         out.close();
     }
