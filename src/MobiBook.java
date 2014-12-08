@@ -75,18 +75,28 @@ public class MobiBook {
         LZ77InputStream lz77;
         byte[] curRecord;
         ByteArrayInputStream curRecStream;
-        for (int i=1; i < recordsCount; i++) {
-            //TODO: length of last record
-            PrintWriter outRec = new PrintWriter(new File("recs/rec" + i + ".txt"));
-            curRecLength = (int)((Long)records[i+1].recordInfo.get("record Data Offset") - (Long)records[i].recordInfo.get("record Data Offset"));
+        long firstNonBook = this.<Long>getValue("First Non-book index?", mobiHeader);
+        FileOutputStream outText = new FileOutputStream(new File("recs/text.html"));
+        for (int i=1; i <= recordsCount; i++) {
+            FileOutputStream outRec = new FileOutputStream(new File("recs/rec" + i + ".txt"));
+            if (i < recordsCount) {
+                curRecLength = (int)((Long)records[i+1].recordInfo.get("record Data Offset") - (Long)records[i].recordInfo.get("record Data Offset"));
+            } else {
+                curRecLength = fileStream.available();
+            }
             curRecord = new byte[curRecLength];
             fileStream.read(curRecord);
-            curRecStream = new ByteArrayInputStream(curRecord);
-            lz77 = new LZ77InputStream(curRecStream);
-            parseRecord(lz77, outRec, curRecLength);
-
+            if (i < firstNonBook) {
+                outRec = outText;
+                curRecStream = new ByteArrayInputStream(curRecord);
+                lz77 = new LZ77InputStream(curRecStream);
+                parseRecord(lz77, outRec, curRecLength);
+            } else {
+                parseNonLZ77Record(fileStream, outRec, curRecLength);
+                outRec.close();
+            }
         }
-
+        outText.close();
     }
 
     public boolean hasEXTHHeader() {
@@ -187,15 +197,25 @@ public class MobiBook {
         this.fileStream.skip(3 - ((this.<Long>getValue("header length", this.EXTHHeader) - 1)&3));
     }
 
-    public void parseRecord (LZ77InputStream lz77,  PrintWriter out, int len) throws Exception{
-        int length = Math.min(len, fileStream.available());
-        byte[] data = new byte[length];
-        try {
-            lz77.read(data, 0, length);
-        } catch (Exception eee) {
-
+    public void parseRecord(LZ77InputStream lz77,  FileOutputStream out, int len) throws Exception{
+        int toRead = len;
+        int cur = 0;
+        byte[] data;
+        while (toRead > 0) {
+            data = new byte[toRead];
+            try {
+                cur = lz77.read(data, 0, toRead);
+                cur = cur < 0 ? toRead : cur;
+            } catch (Exception ee) {
+            }
+            toRead -= cur;
+            out.write(data);
         }
-        out.print(new String(data));
-        out.close();
+    }
+
+    public void parseNonLZ77Record(InputStream in, FileOutputStream out, int len) throws Exception{
+        byte[] data = new byte[len];
+        in.read(data);
+        out.write(data);
     }
 }
