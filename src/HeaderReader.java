@@ -148,7 +148,7 @@ public class HeaderReader {
 
     public static void main (String argz[]) throws Exception {
         createScheme();
-        FileInputStream in = new FileInputStream(new File("ustBooks/Ieriesi - Eduard Limonov.mobi"));
+        FileInputStream in = new FileInputStream(new File("ustBooks/Inostraniets v Smutnoie vriemia - Eduard Limonov.mobi"));
 /**        for (int i=0; i<100; i++) {
             read4bytes(in, length);
             System.out.println(4*i + " " + length[0]);
@@ -176,7 +176,7 @@ public class HeaderReader {
 //        HashMap<String, Integer> PalmDOCHeader = readPalmDOCHeader(in);
 //        System.out.println(PalmDOCHeader.get("record size"));
         MobiBook book = new MobiBook();
-        book.parse("ustBooks/Ieriesi - Eduard Limonov.mobi");
+        book.parse("test.mobi");
         System.out.println(book.palmDB.get("number of records"));
         System.out.println((String)book.mobiHeader.get("identifier"));
         System.out.println("name: " + (String)book.finallyGetName());
@@ -219,5 +219,8 @@ public class HeaderReader {
             recOffs.println(book.records[i].recordInfo.get("record Data Offset"));
         }
         recOffs.close();
+        System.out.println(book.mobiHeader.get("FLIS record number"));
+        System.out.println(book.imagesCount);
+        System.out.println(book.bookName);
     }
 }

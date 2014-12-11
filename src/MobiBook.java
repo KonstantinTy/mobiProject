@@ -22,6 +22,7 @@ public class MobiBook {
     public HashMap<String, Object> mobiHeader;
     public HashMap<String, Object> EXTHHeader;
     public long record0Start;
+    public long imagesCount;
 
     public String bookName;
 
@@ -76,24 +77,33 @@ public class MobiBook {
         byte[] curRecord;
         ByteArrayInputStream curRecStream;
         long firstNonBook = this.<Long>getValue("First Non-book index?", mobiHeader);
-        FileOutputStream outText = new FileOutputStream(new File("recs/text.html"));
+        long firstImage = this.<Long>getValue("First Image index", mobiHeader);
+        long firstNonImage = this.<Integer>getValue("Last content record number", mobiHeader) + 1;
+        this.imagesCount = firstImage < firstNonImage ? (firstNonImage - firstImage) : 0;
+        PrintWriter outText = new PrintWriter(new File("recs/text.html"));
         for (int i=1; i <= recordsCount; i++) {
-            FileOutputStream outRec = new FileOutputStream(new File("recs/rec" + i + ".txt"));
+            FileOutputStream outRec;
             if (i < recordsCount) {
                 curRecLength = (int)((Long)records[i+1].recordInfo.get("record Data Offset") - (Long)records[i].recordInfo.get("record Data Offset"));
             } else {
                 curRecLength = fileStream.available();
             }
-            curRecord = new byte[curRecLength];
-            fileStream.read(curRecord);
             if (i < firstNonBook) {
-                outRec = outText;
+                curRecord = new byte[curRecLength];
+                fileStream.read(curRecord);
                 curRecStream = new ByteArrayInputStream(curRecord);
                 lz77 = new LZ77InputStream(curRecStream);
-                parseRecord(lz77, outRec, curRecLength);
+                parseRecord2(lz77, outText, curRecLength);
             } else {
-                parseNonLZ77Record(fileStream, outRec, curRecLength);
-                outRec.close();
+                if ((i >= firstImage) && (i < firstNonImage)) {
+                    outRec = new FileOutputStream(new File("recs/image" + (i - firstImage + 1) + ".jpg"));
+                    parseNonLZ77Record(fileStream, outRec, curRecLength);
+                    outRec.close();
+                } else {
+                    outRec = new FileOutputStream(new File("recs/rec" + i + ".txt"));
+                    parseNonLZ77Record(fileStream, outRec, curRecLength);
+                    outRec.close();
+                }
             }
         }
         outText.close();
@@ -212,7 +222,47 @@ public class MobiBook {
             out.write(data);
         }
     }
+    public void parseRecord2(LZ77InputStream lz77,  PrintWriter out, int len) throws Exception{
+        int toRead = len;
+        int cur = 0;
+        byte[] data;
+        while (toRead > 0) {
+            data = new byte[toRead];
+            try {
+                cur = lz77.read(data, 0, toRead);
+                cur = cur < 0 ? toRead : cur;
+            } catch (Exception ee) {
+            }
+            toRead -= cur;
+            String s;
+            s = remakeImageTags(new String(data));
+            out.write(s);
+        }
+    }
 
+    public String remakeImageTags(String s) {
+        int i = 0;
+        int tagEnd;
+        while (i >= 0 ) {
+            i = s.indexOf("recindex", i);
+            if (i < 0) break;
+            tagEnd = s.indexOf("</img", i);
+            i = s.indexOf("recindex", i);
+                i = s.indexOf("\"", i);
+                tagEnd = s.indexOf("\"", i + 1);
+                if ((i < 0)||(tagEnd <= i)) {
+                    System.out.println("\" mismatch");
+                } else {
+                    String numString = s.substring(i + 1, tagEnd);
+                    int num = Integer.parseInt(numString);
+                    String imgFileName = "image" + num + ".jpg";
+                    s = s.replace("recindex=\"" + numString + "\"", "src=\"" + imgFileName + "\"");
+                    System.out.println("Image " + num + " replaced");
+                }
+
+        }
+        return s;
+    }
     public void parseNonLZ77Record(InputStream in, FileOutputStream out, int len) throws Exception{
         byte[] data = new byte[len];
         in.read(data);
